@@ -312,7 +312,7 @@ AC_DEFINE(BN_GCD, BASIC, Chosen multiple precision greatest common divisor metho
 AC_DEFINE(BN_GEN, BASIC, Chosen prime generation algorithm.)
 
 AC_DEFINE(FP_PRIME, 381, Prime field size in bits.)
-AC_DEFINE(FP_METHD, "INTEG;INTEG;INTEG;MONTY;LOWER;SLIDE", Prime field arithmetic method.)
+AC_DEFINE(FP_METHD, "INTEG;INTEG;INTEG;MONTY;LOWER;LOWER;SLIDE", Prime field arithmetic method.)
 AC_DEFINE(FP_KARAT, 0, Number of Karatsuba steps.)
 AC_DEFINE(FP_WIDTH, 4, Width of window processing for exponentiation methods.)
 AC_DEFINE(FP_ADD, INTEG, Chosen prime field multiplication method.)
@@ -320,6 +320,7 @@ AC_DEFINE(FP_MUL, INTEG, Chosen prime field multiplication method.)
 AC_DEFINE(FP_SQR, INTEG, Chosen prime field multiplication method.)
 AC_DEFINE(FP_RDC, MONTY, Chosen prime field reduction method.)
 AC_DEFINE(FP_INV, LOWER, Chosen prime field inversion method.)
+AC_DEFINE(FP_SMB, LOWER, Chosen prime field Legendre symbol method.)
 AC_DEFINE(FP_EXP, SLIDE, Chosen multiple precision modular exponentiation method.)
 
 AC_DEFINE(FPX_METHD, "INTEG;INTEG;LAZYR", Prime extension field arithmetic method.)
