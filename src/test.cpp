@@ -641,7 +641,6 @@ TEST_CASE("Signature tests")
     SECTION("Should not verify aggregate with same message under BasicScheme")
     {
         vector<uint8_t> message = {100, 2, 254, 88, 90, 45, 23};
-        uint8_t hash[BLS::MESSAGE_HASH_LEN];
 
         vector<uint8_t> seed(32, 0x50);
         vector<uint8_t> seed2(32, 0x70);
@@ -662,7 +661,6 @@ TEST_CASE("Signature tests")
     SECTION("Should verify aggregate with same message under AugScheme/PopScheme")
     {
         vector<uint8_t> message = {100, 2, 254, 88, 90, 45, 23};
-        uint8_t hash[BLS::MESSAGE_HASH_LEN];
 
         vector<uint8_t> seed(32, 0x50);
         vector<uint8_t> seed2(32, 0x70);
