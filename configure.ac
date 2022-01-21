@@ -266,6 +266,21 @@ AC_COMPILE_IFELSE([AC_LANG_SOURCE([[char foo;]])],
       CFLAGS="$saved_CFLAGS"
     ])
 
+if test "x$CXXFLAGS_overridden" = "xno"; then
+  AC_LANG_PUSH([C++])
+  AX_CHECK_COMPILE_FLAG([-Wall], [WARN_CXXFLAGS="$WARN_CXXFLAGS -Wall"], [], [])
+  AX_CHECK_COMPILE_FLAG([-Wextra], [WARN_CXXFLAGS="$WARN_CXXFLAGS -Wextra"], [], [])
+  AX_CHECK_COMPILE_FLAG([-Wcast-align], [WARN_CXXFLAGS="$WARN_CXXFLAGS -Wcast-align"], [], [])
+  AX_CHECK_COMPILE_FLAG([-Wredundant-decls], [WARN_CXXFLAGS="$WARN_CXXFLAGS -Wredundant-decls"], [], [])
+  AX_CHECK_COMPILE_FLAG([-Wformat -Wformat-security], [WARN_CXXFLAGS="$WARN_CXXFLAGS -Wformat -Wformat-security"], [], [])
+  AX_CHECK_COMPILE_FLAG([-Wthread-safety-analysis], [WARN_CXXFLAGS="$WARN_CXXFLAGS -Wthread-safety-analysis"], [], [])
+  AX_CHECK_COMPILE_FLAG([-Wrange-loop-analysis], [WARN_CXXFLAGS="$WARN_CXXFLAGS -Wrange-loop-analysis"], [], [])
+
+  AX_CHECK_COMPILE_FLAG([-Wunused-parameter], [NOWARN_CXXFLAGS="$NOWARN_CXXFLAGS -Wno-unused-parameter"], [], [])
+  AX_CHECK_COMPILE_FLAG([-Wvla], [NOWARN_CXXFLAGS="$NOWARN_CXXFLAGS -Wno-vla"], [], [])
+  AC_LANG_POP([C++])
+fi
+
 AC_LANG_PUSH([C])
 AX_CHECK_COMPILE_FLAG([-Wall], [WARN_CFLAGS="$WARN_CFLAGS -Wall"], [], [])
 AX_CHECK_COMPILE_FLAG([-Wextra], [WARN_CFLAGS="$WARN_CFLAGS -Wextra"], [], [])
@@ -463,6 +478,8 @@ AC_SUBST(SODIUM_LIBS)
 AC_SUBST(RELIC_CPPFLAGS)
 AC_SUBST(WARN_CFLAGS)
 AC_SUBST(NOWARN_CFLAGS)
+AC_SUBST(WARN_CXXFLAGS)
+AC_SUBST(NOWARN_CXXFLAGS)
 AC_SUBST(LIBTOOL_APP_LDFLAGS)
 
 
