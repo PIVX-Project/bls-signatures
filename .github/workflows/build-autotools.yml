@@ -56,7 +56,7 @@ jobs:
 
       - name: Setup Arches
         if: matrix.config.arch
-        uses: ryankurte/action-apt@v0.3.0
+        uses: ryankurte/action-apt@master
         with:
           arch: ${{ matrix.config.arch }}
           packages: ${{ matrix.config.arch_packages }}
