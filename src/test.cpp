@@ -29,7 +29,7 @@ using std::vector;
 
 using namespace bls;
 
-void TestHKDF(string ikm_hex, string salt_hex, string info_hex, string prk_expected_hex, string okm_expected_hex, int L) {
+void TestHKDF(string ikm_hex, string salt_hex, string info_hex, string prk_expected_hex, string okm_expected_hex, size_t L) {
     vector<uint8_t> ikm = Util::HexToBytes(ikm_hex);
     vector<uint8_t> salt = Util::HexToBytes(salt_hex);
     vector<uint8_t> info = Util::HexToBytes(info_hex);
@@ -471,9 +471,13 @@ TEST_CASE("Error handling")
     {
         vector<uint8_t> buf(G1Element::SIZE, 0);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 0xFF; i++) {
             buf[0] = (uint8_t)i;
-            REQUIRE_THROWS(G1Element::FromByteVector(buf));
+            if (i == 0xc0) { // Infinity prefix shouldn't throw here as we have only zero values
+                REQUIRE_NOTHROW(G1Element::FromByteVector(buf));
+            } else {
+                REQUIRE_THROWS(G1Element::FromByteVector(buf));
+            }
         }
     }
 
@@ -481,10 +485,17 @@ TEST_CASE("Error handling")
     {
         vector<uint8_t> buf(G2Element::SIZE, 0);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 0xFF; i++) {
             buf[0] = (uint8_t)i;
-            REQUIRE_THROWS(G2Element::FromByteVector(buf));
+            if (i == 0xc0) { // Infinity prefix shouldn't throw here as we have only zero values
+                REQUIRE_NOTHROW(G2Element::FromByteVector(buf));
+            } else {
+                REQUIRE_THROWS(G2Element::FromByteVector(buf));
+            }
         }
+        // Trigger "G2 element must always have 48th byte start with 0b000" error case
+        buf[48] = 0xFF;
+        REQUIRE_THROWS(G2Element::FromByteVector(buf));
     }
 
     SECTION("Error handling should be thread safe")
@@ -630,7 +641,6 @@ TEST_CASE("Signature tests")
     SECTION("Should not verify aggregate with same message under BasicScheme")
     {
         vector<uint8_t> message = {100, 2, 254, 88, 90, 45, 23};
-        uint8_t hash[BLS::MESSAGE_HASH_LEN];
 
         vector<uint8_t> seed(32, 0x50);
         vector<uint8_t> seed2(32, 0x70);
@@ -651,7 +661,6 @@ TEST_CASE("Signature tests")
     SECTION("Should verify aggregate with same message under AugScheme/PopScheme")
     {
         vector<uint8_t> message = {100, 2, 254, 88, 90, 45, 23};
-        uint8_t hash[BLS::MESSAGE_HASH_LEN];
 
         vector<uint8_t> seed(32, 0x50);
         vector<uint8_t> seed2(32, 0x70);
@@ -1313,7 +1322,7 @@ TEST_CASE("Threshold Signatures") {
 
         // First create the participants and their secrets
         std::vector<Participant> participants;
-        for (int i=0; i < n ; i++) {
+        for (size_t i=0; i < n ; i++) {
             Participant participant;
             participant.id = getRandomSeed();
             participant.sk = randPrivKey();
@@ -1322,7 +1331,7 @@ TEST_CASE("Threshold Signatures") {
             // Create the vectors' coefficients
             participant.sks.emplace_back(participant.sk);
             participant.pks.emplace_back(participant.pk);
-            for (int j = 0; j < (m-1); j++) {
+            for (size_t j = 0; j < (m-1); j++) {
                 auto sk = randPrivKey();
                 participant.sks.emplace_back(sk);
                 participant.pks.emplace_back(sk.GetG1Element());
@@ -1332,7 +1341,7 @@ TEST_CASE("Threshold Signatures") {
 
         // Second, create shares for every other participant
         for (Participant& participant : participants) {
-            for (int j=0; j < n; j++) {
+            for (size_t j=0; j < n; j++) {
                 RawData id = participants[j].id;
                 participant.sksShares.emplace(id, bls::Threshold::PrivateKeyShare(participant.sks, Bytes(id)));
                 participant.pksShares.emplace(id, bls::Threshold::PublicKeyShare(participant.pks, Bytes(id)));
@@ -1342,7 +1351,7 @@ TEST_CASE("Threshold Signatures") {
 
         // Third, send shares and verification vectors
         for (Participant& participant : participants) {
-            for (int j=0; j < n; j++) {
+            for (size_t j=0; j < n; j++) {
                 auto& recipient = participants[j];
                 RawData destId = recipient.id;
                 // S(x) evaluated in participant1.id.
@@ -1381,8 +1390,8 @@ TEST_CASE("Threshold Signatures") {
 
         // Let's aggregate all the verification vectors to obtain Pa():
         std::vector<G1Element> finalVerifVector(participants[0].pks);
-        for (int j = 1; j < participants.size(); j++) {
-            for (int i = 0; i < finalVerifVector.size(); i++) {
+        for (size_t j = 1; j < participants.size(); j++) {
+            for (size_t i = 0; i < finalVerifVector.size(); i++) {
                 finalVerifVector[i] += participants[j].pks.at(i);
             }
         }
@@ -1408,7 +1417,7 @@ TEST_CASE("Threshold Signatures") {
         // Let's aggregate all the SIG(0) values to obtain SIGa(0)
         // This will be checked for equality against the recovered threshold signature
         G2Element finalSIG = participants[0].sig;
-        for (int j = 1; j < participants.size(); j++) {
+        for (size_t j = 1; j < participants.size(); j++) {
             finalSIG += participants[j].sig;
         }
 
