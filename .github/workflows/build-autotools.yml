@@ -42,8 +42,24 @@ jobs:
             arch_packages: libgmp-dev libsodium-dev
             unit_tests: true
 
+          - name: x86_64 Linux-latest
+            os: ubuntu-latest
+            host: x86_64-unknown-linux-gnu
+            arch: armhf # dummy arch
+            apt_get: gcc-multilib g++-multilib
+            arch_packages: libgmp-dev libsodium-dev
+            unit_tests: true
+
           - name: x86_64 MacOS
             os: macos-11
+            host: x86_64-apple-darwin20.6.0
+            brew_install: autoconf automake libtool gmp libsodium
+            cc: clang
+            cxx: clang++
+            unit_tests: true
+
+          - name: x86_64 MacOS-latest
+            os: macos-latest
             host: x86_64-apple-darwin20.6.0
             brew_install: autoconf automake libtool gmp libsodium
             cc: clang
